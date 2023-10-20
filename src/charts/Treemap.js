@@ -188,10 +188,43 @@ export default class TreemapChart {
             y2
           )
         }
+
+
+        let textRect = graphics.getTextRects(formattedText, fontSize);
+        let x;
+        let y;
+
+        switch (w.config.plotOptions.treemap.dataLabels.verticalAnchor) {
+          case "top":
+            y = y1 + (this.strokeWidth * 2) + ((fontSize / 3) * 2);
+            break;
+          case "bottom":
+            y = y2 - textRect.height;
+            break;
+          case "middle":
+          default:
+            y = (y1 + y2) / 2 - textRect.height / 2 + this.strokeWidth / 2 + fontSize / 3;
+            break;
+        }
+
+        switch (w.config.plotOptions.treemap.dataLabels.horizontalAnchor) {
+          case "left":
+            x = x1 + this.strokeWidth + ((fontSize / 3) * 2);
+            break;
+          case "right":
+            x = x2 - this.strokeWidth - ((fontSize / 3) * 2);
+            break;
+          case "middle":
+          default:
+            x = (x1 + x2) / 2;
+            break;
+        }
+
+
         let dataLabels = this.helpers.calculateDataLabels({
           text: formattedText,
-          x: (x1 + x2) / 2,
-          y: (y1 + y2) / 2 + this.strokeWidth / 2 + fontSize / 3,
+          x: x,
+          y: y,
           i,
           j,
           colorProps,
@@ -295,8 +328,7 @@ export default class TreemapChart {
 
       elText.node.setAttribute(
         'transform',
-        `rotate(-90 ${labelRotatingCenter.x} ${
-          labelRotatingCenter.y
+        `rotate(-90 ${labelRotatingCenter.x} ${labelRotatingCenter.y
         }) translate(${textRect.height / 3})`
       )
     }
@@ -311,7 +343,7 @@ export default class TreemapChart {
     // Determine max width based on ideal orientation of text
     const labelMaxWidth =
       textRect.width + this.w.config.stroke.width + 5 > x2 - x1 &&
-      y2 - y1 > x2 - x1
+        y2 - y1 > x2 - x1
         ? y2 - y1
         : x2 - x1
     const truncatedText = graphics.getTextBasedOnMaxWidth({
