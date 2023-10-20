@@ -19128,13 +19128,21 @@
           fillColor = w.config.series[i].data[j].fillColor;
         }
 
+        function tryGetFillType(type, index) {
+          if (type && Array.isArray(type)) {
+            return type[index];
+          }
+
+          return type;
+        }
+
         var pathFill = fill.fillPath({
           seriesNumber: this.barCtx.barOptions.distributed ? seriesNumber : realIndex,
           dataPointIndex: j,
           color: fillColor,
           value: series[i][j],
           fillConfig: (_w$config$series$i$da = w.config.series[i].data[j]) === null || _w$config$series$i$da === void 0 ? void 0 : _w$config$series$i$da.fill,
-          fillType: (_w$config$series$i$da2 = w.config.series[i].data[j]) !== null && _w$config$series$i$da2 !== void 0 && (_w$config$series$i$da3 = _w$config$series$i$da2.fill) !== null && _w$config$series$i$da3 !== void 0 && _w$config$series$i$da3.type ? (_w$config$series$i$da4 = w.config.series[i].data[j]) === null || _w$config$series$i$da4 === void 0 ? void 0 : _w$config$series$i$da4.fill.type : w.config.fill.type
+          fillType: (_w$config$series$i$da2 = w.config.series[i].data[j]) !== null && _w$config$series$i$da2 !== void 0 && (_w$config$series$i$da3 = _w$config$series$i$da2.fill) !== null && _w$config$series$i$da3 !== void 0 && _w$config$series$i$da3.type ? (_w$config$series$i$da4 = w.config.series[i].data[j]) === null || _w$config$series$i$da4 === void 0 ? void 0 : _w$config$series$i$da4.fill.type : tryGetFillType(w.config.fill.type, i)
         });
         return pathFill;
       }
@@ -24897,10 +24905,44 @@
               formattedText = _this.truncateLabels(formattedText, fontSize, x1, y1, x2, y2);
             }
 
+            var textRect = graphics.getTextRects(formattedText, fontSize);
+            var x;
+            var y;
+
+            switch (w.config.plotOptions.treemap.dataLabels.verticalAnchor) {
+              case "top":
+                y = y1 + _this.strokeWidth * 2 + fontSize / 3 * 2;
+                break;
+
+              case "bottom":
+                y = y2 - textRect.height;
+                break;
+
+              case "middle":
+              default:
+                y = (y1 + y2) / 2 - textRect.height / 2 + _this.strokeWidth / 2 + fontSize / 3;
+                break;
+            }
+
+            switch (w.config.plotOptions.treemap.dataLabels.horizontalAnchor) {
+              case "left":
+                x = x1 + _this.strokeWidth + fontSize / 3 * 2;
+                break;
+
+              case "right":
+                x = x2 - _this.strokeWidth - fontSize / 3 * 2;
+                break;
+
+              case "middle":
+              default:
+                x = (x1 + x2) / 2;
+                break;
+            }
+
             var dataLabels = _this.helpers.calculateDataLabels({
               text: formattedText,
-              x: (x1 + x2) / 2,
-              y: (y1 + y2) / 2 + _this.strokeWidth / 2 + fontSize / 3,
+              x: x,
+              y: y,
               i: i,
               j: j,
               colorProps: colorProps,
