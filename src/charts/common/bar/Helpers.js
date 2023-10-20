@@ -220,6 +220,13 @@ export default class Helpers {
       fillColor = w.config.series[i].data[j].fillColor
     }
 
+    function tryGetFillType(type, index) {
+      if (type && Array.isArray(type)) {
+        return type[index];
+      }
+      return type;
+    }
+
     let pathFill = fill.fillPath({
       seriesNumber: this.barCtx.barOptions.distributed
         ? seriesNumber
@@ -230,7 +237,7 @@ export default class Helpers {
       fillConfig: w.config.series[i].data[j]?.fill,
       fillType: w.config.series[i].data[j]?.fill?.type
         ? w.config.series[i].data[j]?.fill.type
-        : w.config.fill.type,
+        : tryGetFillType(w.config.fill.type, i),
     })
 
     return pathFill
@@ -518,7 +525,7 @@ export default class Helpers {
         (this.barCtx.isReversed
           ? value / this.barCtx.yRatio[this.barCtx.yaxisIndex]
           : 0) *
-          2
+        2
     }
     return yForVal
   }
